@@ -18,7 +18,7 @@ import { User } from './user/entities/user.entity';
       password: '123456',
       database: 'login_test',
       synchronize: true,
-      logging: true,
+      logging: false,
       entities: [User],
       poolSize: 10,
       connectorPackage: 'mysql2',
