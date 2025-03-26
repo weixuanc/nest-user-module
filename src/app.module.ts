@@ -6,8 +6,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 
-import { User } from './user/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
+
+import { User } from './user/entities/user.entity';
+import { Permission } from './user/entities/permission.entity';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { JwtModule } from '@nestjs/jwt';
       database: 'login_test',
       synchronize: true,
       logging: false,
-      entities: [User],
+      entities: [User, Permission],
       poolSize: 10,
       connectorPackage: 'mysql2',
       extra: {

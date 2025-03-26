@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Res, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,13 +9,13 @@ import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Inject(JwtService)
   private jwtService: JwtService
 
   @Post('login')
-  async login(@Body() user: LoginDto, @Res({passthrough: true}) res: Response) {
+  async login(@Body(ValidationPipe) user: LoginDto, @Res({ passthrough: true }) res: Response) {
     const foundUser = await this.userService.login(user);
     if (foundUser) {
       const token = await this.jwtService.signAsync({
@@ -32,8 +32,14 @@ export class UserController {
   }
 
   @Post('register')
-  async register(@Body() user: RegisterDto) {
+  async register(@Body(ValidationPipe) user: RegisterDto) {
     return await this.userService.register(user);
+  }
+
+  @Get('init')
+  async initData() {
+    await this.userService.initData();
+    return 'done'
   }
 
 }
