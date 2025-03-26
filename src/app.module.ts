@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 
 import { User } from './user/entities/user.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -24,6 +25,13 @@ import { User } from './user/entities/user.entity';
       connectorPackage: 'mysql2',
       extra: {
         authPlugins: 'sha256_password'
+      }
+    }),
+    JwtModule.register({
+      global: true, // 声明为全局模块，不用每个模块都引入
+      secret: 'test',
+      signOptions: {
+        expiresIn: '7d'
       }
     }),
     UserModule
