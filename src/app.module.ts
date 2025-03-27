@@ -10,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { User } from './user/entities/user.entity';
 import { Permission } from './user/entities/permission.entity';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { Permission } from './user/entities/permission.entity';
         expiresIn: '7d'
       }
     }),
-    UserModule
+    UserModule,
+    RedisModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,6 +3,7 @@ import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { UserService } from '../user.service';
 import { Reflector } from '@nestjs/core';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -12,6 +13,9 @@ export class PermissionGuard implements CanActivate {
 
   @Inject(Reflector)
   private reflector: Reflector;
+
+  @Inject(RedisService)
+  private redisService: RedisService;
 
   async canActivate(
     context: ExecutionContext,
@@ -23,12 +27,18 @@ export class PermissionGuard implements CanActivate {
       throw new UnauthorizedException('用户未登录');
     }
 
-    const foundUser = await this.userService.findByUsername(user.username);
+    let permissions = await this.redisService.listGet(`user_${user.username}_permissions`);
+    console.log('redis', permissions)
+    if (permissions.length === 0) {
+      const foundUser: any = await this.userService.findByUsername(user.username);
+      permissions = foundUser.permission.map(item => item.name);
+      console.log('permissions', permissions)
+      this.redisService.listSet(`user_${user.username}_permissions`, permissions, 60 * 30)
+    }
 
     const permission = this.reflector.get('permission', context.getHandler());
-
-    console.log(permission)
-    if (foundUser?.permission.some(item => item.name === permission)) {
+    console.log('permission', permission)
+    if (permissions.some(item => item === permission)) {
       return true;
     } else {
       throw new UnauthorizedException('没有权限访问接口');
