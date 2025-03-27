@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class LoginGuard implements CanActivate {
+export class JwtGuard implements CanActivate {
   @Inject(JwtService)
   private jwtService: JwtService;
 

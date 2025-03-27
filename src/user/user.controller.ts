@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Res, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Res, ValidationPipe, Session } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,8 +14,8 @@ export class UserController {
   @Inject(JwtService)
   private jwtService: JwtService
 
-  @Post('login')
-  async login(@Body(ValidationPipe) user: LoginDto, @Res({ passthrough: true }) res: Response) {
+  @Post('jwt/login')
+  async jwtLogin(@Body(ValidationPipe) user: LoginDto, @Res({ passthrough: true }) res: Response) {
     const foundUser = await this.userService.login(user);
     if (foundUser) {
       const token = await this.jwtService.signAsync({
@@ -25,9 +25,25 @@ export class UserController {
         }
       })
       res.setHeader('token', token);
-      return '登录成功';
+      return 'JWT登录成功';
     } else {
-      return '登录失败';
+      return 'JWT登录失败';
+    }
+  }
+
+  @Post('session/login')
+  async sessionLogin(
+    @Body(ValidationPipe) user: LoginDto,
+    @Session() session
+  ) {
+    const foundUser = await this.userService.login(user);
+    if (foundUser) {
+      session.user = {
+        username: user.username
+      }
+      return 'Session登录成功';
+    } else {
+      return 'Session登录失败';
     }
   }
 

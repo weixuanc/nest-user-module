@@ -1,18 +1,21 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, SetMetadata, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
-import { LoginGuard } from './login.guard';
+import { JwtGuard } from './user/guard/jwt.guard';
+import { SessionGuard } from './user/guard/session.guard';
+import { PermissionGuard } from './user/guard/permission.guard';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @UseGuards(LoginGuard)
+  @UseGuards(JwtGuard)
   @Get('aaa')
   aaa() {
     return 'aaa';
   }
 
-  @UseGuards(LoginGuard)
+  @UseGuards(SessionGuard, PermissionGuard)
+  @SetMetadata('permission', 'query_bbb')
   @Get('bbb')
   bbb() {
     return 'bbb';

@@ -62,6 +62,18 @@ export class UserService {
     }
   }
 
+  async findByUsername(username: string) {
+    const user = await this.entityManager.findOne(User, {
+      where: {
+        username
+      },
+      relations: {
+        permission: true
+      }
+    });
+    return user;
+  }
+
   async initData() {
     const permission1 = new Permission();
     permission1.name = 'create_aaa';
